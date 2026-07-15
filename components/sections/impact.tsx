@@ -61,10 +61,54 @@ interface StatCardProps {
 }
 
 function StatCard({ stat }: StatCardProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [count, setCount] = useState(0);
+  const [triggered, setTriggered] = useState(false);
+
+  const numeric = parseInt(stat.value, 10);
+  const suffix = stat.value.replace(String(numeric), "");
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !triggered) {
+          setTriggered(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.4 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [triggered]);
+
+  useEffect(() => {
+    if (!triggered) return;
+    const duration = 1500;
+    const steps = 60;
+    const increment = numeric / steps;
+    let current = 0;
+    const interval = setInterval(() => {
+      current += increment;
+      if (current >= numeric) {
+        setCount(numeric);
+        clearInterval(interval);
+      } else {
+        setCount(Math.floor(current));
+      }
+    }, duration / steps);
+    return () => clearInterval(interval);
+  }, [triggered, numeric]);
+
   return (
-    <div className="flex flex-col items-center rounded-2xl border border-soft-pink bg-paper px-6 py-8 text-center">
+    <div
+      ref={ref}
+      className="flex flex-col items-center rounded-2xl border border-soft-pink bg-paper px-6 py-8 text-center"
+    >
       <span className="font-heading text-5xl font-bold tabular-nums text-hot-pink sm:text-6xl">
-        {stat.value}
+        {triggered ? `${count}${suffix}` : `0${suffix}`}
       </span>
       <span className="mt-3 font-heading text-lg font-semibold text-plum">
         {stat.label}
