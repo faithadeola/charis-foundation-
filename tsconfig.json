@@ -13,13 +13,20 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@components/*": ["./components/*"],
+      "@sections/*": ["./components/sections/*"],
+      "@shared/*": ["./shared/*"],
+      "@icons": ["./shared/ui/icons/index.ts"]
     }
   },
   "include": [
